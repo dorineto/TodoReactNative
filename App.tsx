@@ -1,118 +1,178 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    View,
+    Button,
 } from 'react-native';
 
+import {Provider, useDispatch, useSelector} from 'react-redux';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {store} from './slicers/store';
+import {increment, selectCount, setCount} from './slicers/counterSlice';
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+    Counter,
+    getDBConnection,
+    getCounter,
+    updateCounter,
+    createTables,
+    insertCounter,
+} from './database/todo-db';
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+let tstInitializedDB = false;
+async function getCounterDB(): Promise<Counter> {
+    let dbConnection: SQLiteDatabase | null = null;
+    let counter: Counter = {id: 0, count: 0};
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+    try {
+        dbConnection = await getDBConnection();
+
+        if (!tstInitializedDB) {
+            await createTables(dbConnection);
+            tstInitializedDB = true;
+        }
+
+        counter = await getCounter(dbConnection);
+    } catch (error) {
+        console.log(error);
+    } finally {
+        if (dbConnection) dbConnection.close();
+    }
+
+    return counter;
+}
+
+async function updateCounterDB(counter: Counter): Promise<Counter> {
+    let dbConnection: SQLiteDatabase | null = null;
+    let returnedCounter = {...counter};
+
+    try {
+        dbConnection = await getDBConnection();
+
+        if (!tstInitializedDB) {
+            await createTables(dbConnection);
+            tstInitializedDB = true;
+        }
+
+        if (counter.id <= 0)
+            returnedCounter.id = await insertCounter(dbConnection, counter);
+        else
+            await updateCounter(dbConnection, counter);
+    } catch (error) {
+        console.log(error);
+    } finally {
+        if (dbConnection) dbConnection.close();
+    }
+
+    return returnedCounter;
+}
+
+function Content(): JSX.Element {
+    const [counter, setCounter] = useState({id: 0, count: 0});
+    const count = useSelector(selectCount);
+    const dispatch = useDispatch();
+
+    const getCounterDBCallBack = useCallback(() => {
+        const updateStateCounter = async () => {
+            let counterReturned = await getCounterDB();
+
+            if (counterReturned.id === 0)
+                counterReturned = await updateCounterDB(counterReturned);
+
+            setCounter(counterReturned);
+            dispatch(setCount(counterReturned.count));
+        };
+
+        updateStateCounter();
+    }, [setCounter, dispatch]);
+
+    useEffect(() => {
+        getCounterDBCallBack();
+    }, [getCounterDBCallBack]);
+
+    const [textPlaceHolder, settextPlaceHolder] = useState('Hello World');
+    const isDarkMode = useColorScheme() === 'dark';
+
+    const backgroundStyle = {
+        backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    };
+
+    return (
+        <SafeAreaView style={backgroundStyle}>
+            <StatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                backgroundColor={backgroundStyle.backgroundColor}
+            />
+            <ScrollView
+                contentInsetAdjustmentBehavior="automatic"
+                style={backgroundStyle}>
+                <View
+                    style={{
+                        backgroundColor: isDarkMode
+                            ? Colors.black
+                            : Colors.white,
+                    }}>
+                    <Text style={styles.padBottom}>
+                        <Text style={styles.bold}>{textPlaceHolder} </Text>
+                        I'm using react native, and that
+                        <Text style={styles.bold}> Rocks </Text>
+                        Olá
+                    </Text>
+                    <Text style={styles.padBottom}>
+                        <Text style={styles.bold}>Counter: </Text>
+                        {count}
+                    </Text>
+                    <Button
+                        title={textPlaceHolder}
+                        onPress={() => {
+                            settextPlaceHolder(
+                                textPlaceHolder === 'Hello World'
+                                    ? 'Yeah!'
+                                    : 'Hello World',
+                            );
+                        }}
+                    />
+                    <Button
+                        title="Increment"
+                        onPress={() => {
+                            const newCounter = {
+                                ...counter,
+                                count: counter.count + 1,
+                            };
+
+                            updateCounterDB(newCounter);
+                            setCounter(newCounter);
+                            
+                            dispatch(increment());
+                        }}
+                    />
+                </View>
+            </ScrollView>
+        </SafeAreaView>
+    );
 }
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    return (
+        <Provider store={store}>
+            <Content />
+        </Provider>
+    );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+    bold: {
+        fontWeight: '700',
+    },
+    padBottom: {
+        paddingBottom: 25,
+    },
 });
 
 export default App;
