@@ -30,8 +30,9 @@ export const getCounter = async (
             'select rowid as id, count from Counter;',
         );
 
-        if (results[0].rows.length > 0)
+        if (results[0].rows.length > 0) {
             return results[0].rows.item(0);
+        }
     } catch (error) {
         console.log(error);
     }
