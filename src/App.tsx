@@ -1,19 +1,12 @@
 import React from 'react';
-import {useState} from 'react';
 import {
     SafeAreaView,
     ScrollView,
     StatusBar,
-    StyleSheet,
-    Text,
-    useColorScheme,
-    View,
-    Button,
 } from 'react-native';
 
 import {store} from './Slicers/store';
-
-import TodoList from './Components/TodoList';
+import TodoScreen from './Components/TodoScreen';
 import {Provider} from 'react-redux';
 
 function App(): JSX.Element {
@@ -22,7 +15,7 @@ function App(): JSX.Element {
             <StatusBar />
             <ScrollView contentInsetAdjustmentBehavior="automatic">
                 <Provider store={store}>
-                    <TodoList />
+                    <TodoScreen />
                 </Provider>
             </ScrollView>
         </SafeAreaView>
