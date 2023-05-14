@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-} from 'react-native';
+import {SafeAreaView, ScrollView, StatusBar} from 'react-native';
 
 import {store} from './Slicers/store';
 import TodoScreen from './Components/TodoScreen';
