@@ -9,3 +9,9 @@ export type Todo = {
     descricao: string;
     prioridade: Prioridade;
 };
+
+export type TodoSet = {
+    [Prioridade.Alta]: Array<Todo>;
+    [Prioridade.Media]: Array<Todo>;
+    [Prioridade.Baixa]: Array<Todo>;
+};

@@ -3,7 +3,7 @@ import {useState} from 'react';
 
 import {Button, TextInput, View, Text} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
-import {Prioridade} from '../Model/Todos';
+import {Prioridade} from '../Modelo/Dominio/Todos';
 
 type PrioridadeItem = {
     id: Prioridade;
@@ -54,7 +54,7 @@ function DropDownPrioridades({
     );
 }
 
-export function TodoFormsAdd(): JSX.Element {
+export function TodoFormsAdiciona(): JSX.Element {
     const [prioridadeSelecionada, _] = useState(prioridades[1]);
 
     return (

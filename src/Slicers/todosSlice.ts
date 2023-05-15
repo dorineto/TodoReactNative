@@ -1,12 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {RootState} from './store';
-import {Todo, Prioridade} from '../Model/Todos';
-
-export type TodoSet = {
-    [Prioridade.Alta]: Array<Todo>;
-    [Prioridade.Media]: Array<Todo>;
-    [Prioridade.Baixa]: Array<Todo>;
-};
+import {Todo, Prioridade} from '../Modelo/Dominio/Todos';
+import {TodoSet} from '../Modelo/Dominio/Todos';
 
 const todoSet: TodoSet = {
     [Prioridade.Alta]: [

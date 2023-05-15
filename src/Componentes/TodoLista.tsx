@@ -2,9 +2,9 @@ import React from 'react';
 
 import {Text, View} from 'react-native';
 
-import {Todo, Prioridade} from '../Model/Todos';
+import {Todo, Prioridade} from '../Modelo/Dominio/Todos';
 
-import {TodoSet} from '../Slicers/todosSlice';
+import {TodoSet} from '../Modelo/Dominio/Todos';
 
 type TodoItemProp = {
     todo: Todo;
@@ -23,7 +23,7 @@ type TodoGroupProp = {
     todos: Array<Todo>;
 };
 
-function TodoGroup({prioridade, todos}: TodoGroupProp): JSX.Element {
+function TodoGroupo({prioridade, todos}: TodoGroupProp): JSX.Element {
     let prioridadeLabel: JSX.Element;
 
     switch (prioridade) {
@@ -54,18 +54,18 @@ export type TodoListProp = {
     todosAgrupados: TodoSet;
 };
 
-function TodoList({todosAgrupados}: TodoListProp): JSX.Element {
+function TodoLista({todosAgrupados}: TodoListProp): JSX.Element {
     return (
         <View>
-            <TodoGroup
+            <TodoGroupo
                 prioridade={Prioridade.Alta}
                 todos={todosAgrupados[Prioridade.Alta]}
             />
-            <TodoGroup
+            <TodoGroupo
                 prioridade={Prioridade.Media}
                 todos={todosAgrupados[Prioridade.Media]}
             />
-            <TodoGroup
+            <TodoGroupo
                 prioridade={Prioridade.Baixa}
                 todos={todosAgrupados[Prioridade.Baixa]}
             />
@@ -73,4 +73,4 @@ function TodoList({todosAgrupados}: TodoListProp): JSX.Element {
     );
 }
 
-export default TodoList;
+export default TodoLista;

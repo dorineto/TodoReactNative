@@ -3,8 +3,8 @@ import {View} from 'react-native';
 //import {useDispatch, useSelector} from 'react-redux';
 import {useSelector} from 'react-redux';
 import {selectTodos} from '../Slicers/todosSlice';
-import TodoList from './TodoList';
-import {TodoFormsAdd} from './TodoFormsAdd';
+import TodoLista from './TodoLista';
+import {TodoFormsAdiciona} from './TodoFormsAdiciona';
 
 export default function TodoScreen(): JSX.Element {
     //const dispatch = useDispatch();
@@ -12,8 +12,8 @@ export default function TodoScreen(): JSX.Element {
 
     return (
         <View style={{padding: 10}}>
-            <TodoList todosAgrupados={todos} />
-            <TodoFormsAdd />
+            <TodoLista todosAgrupados={todos} />
+            <TodoFormsAdiciona />
         </View>
     );
 }
