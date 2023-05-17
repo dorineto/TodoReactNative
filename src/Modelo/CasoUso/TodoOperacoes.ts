@@ -1,4 +1,4 @@
-import {TodoSet, Todo} from '../Dominio/Todos';
+import {TodoSet, Todo, Prioridade} from '../Dominio/Todos';
 
 export interface TodoRepositorio {
     salva: (todo: Todo) => boolean;
@@ -18,7 +18,11 @@ export class TodoOperacoes {
     }
 
     adiciona(todos: TodoSet, todoNovo: Todo): TodoSet {
-        throw 'Não implementado';
+        return {
+            [Prioridade.Alta]: []
+            ,[Prioridade.Media]: [todoNovo]
+            ,[Prioridade.Baixa]: []
+        };
     }
 
     remove(todos: TodoSet, todoRemover: Todo): TodoSet {
