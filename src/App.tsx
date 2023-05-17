@@ -2,7 +2,7 @@ import React from 'react';
 import {SafeAreaView, ScrollView, StatusBar} from 'react-native';
 
 import {store} from './Slicers/store';
-import TodoScreen from './Components/TodoScreen';
+import TodoTela from './Componentes/TodoTela';
 import {Provider} from 'react-redux';
 
 function App(): JSX.Element {
@@ -11,7 +11,7 @@ function App(): JSX.Element {
             <StatusBar />
             <ScrollView contentInsetAdjustmentBehavior="automatic">
                 <Provider store={store}>
-                    <TodoScreen />
+                    <TodoTela />
                 </Provider>
             </ScrollView>
         </SafeAreaView>

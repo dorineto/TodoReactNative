@@ -1,4 +1,4 @@
-import { TodoSet, Todo } from "../Dominio/Todos";
+import {TodoSet, Todo} from '../Dominio/Todos';
 
 export interface TodoRepositorio {
     salva: (todo: Todo) => boolean;
@@ -14,19 +14,24 @@ export class TodoOperacoes {
     }
 
     lista(): TodoSet {
-        throw "Não implementado";
+        return this._repositorioTodo.selecionaTodos();
     }
 
     adiciona(todos: TodoSet, todoNovo: Todo): TodoSet {
-        throw "Não implementado";
+        throw 'Não implementado';
     }
 
     remove(todos: TodoSet, todoRemover: Todo): TodoSet {
-        throw "Não implementado";
+        throw 'Não implementado';
     }
 
     atualiza(todos: TodoSet, todoAtualizar: Todo): TodoSet {
-        throw "Não implementado";
+        throw 'Não implementado';
     }
 }
 
+export function criaTodoOperacoes(
+    repositorioTodo: TodoRepositorio,
+): TodoOperacoes {
+    return new TodoOperacoes(repositorioTodo);
+}

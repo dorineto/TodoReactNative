@@ -51,26 +51,31 @@ function TodoGroupo({prioridade, todos}: TodoGroupProp): JSX.Element {
 }
 
 export type TodoListProp = {
-    todosAgrupados: TodoSet;
+    todosAgrupados: TodoSet | null;
 };
 
 function TodoLista({todosAgrupados}: TodoListProp): JSX.Element {
-    return (
-        <View>
-            <TodoGroupo
-                prioridade={Prioridade.Alta}
-                todos={todosAgrupados[Prioridade.Alta]}
-            />
-            <TodoGroupo
-                prioridade={Prioridade.Media}
-                todos={todosAgrupados[Prioridade.Media]}
-            />
-            <TodoGroupo
-                prioridade={Prioridade.Baixa}
-                todos={todosAgrupados[Prioridade.Baixa]}
-            />
-        </View>
-    );
+    let todoGrupos: JSX.Element | null = null;
+    if (todosAgrupados) {
+        todoGrupos = (
+            <>
+                <TodoGroupo
+                    prioridade={Prioridade.Alta}
+                    todos={todosAgrupados[Prioridade.Alta]}
+                />
+                <TodoGroupo
+                    prioridade={Prioridade.Media}
+                    todos={todosAgrupados[Prioridade.Media]}
+                />
+                <TodoGroupo
+                    prioridade={Prioridade.Baixa}
+                    todos={todosAgrupados[Prioridade.Baixa]}
+                />
+            </>
+        );
+    }
+
+    return <View>{todoGrupos}</View>;
 }
 
 export default TodoLista;

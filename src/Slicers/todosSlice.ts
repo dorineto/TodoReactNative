@@ -1,53 +1,26 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {RootState} from './store';
-import {Todo, Prioridade} from '../Modelo/Dominio/Todos';
 import {TodoSet} from '../Modelo/Dominio/Todos';
 
-const todoSet: TodoSet = {
-    [Prioridade.Alta]: [
-        {
-            id: 1,
-            descricao: 'Tarefa com prioridade Alta',
-            prioridade: Prioridade.Alta,
-        },
-        {
-            id: 2,
-            descricao: 'Terminar esse projeto',
-            prioridade: Prioridade.Alta,
-        },
-    ],
-    [Prioridade.Media]: [
-        {
-            id: 3,
-            descricao: 'Tarefa com prioridade Media',
-            prioridade: Prioridade.Media,
-        },
-    ],
-    [Prioridade.Baixa]: [
-        {
-            id: 4,
-            descricao: 'Tarefa com prioridade Baixa',
-            prioridade: Prioridade.Alta,
-        },
-        {
-            id: 5,
-            descricao: 'O estilo desse projeto',
-            prioridade: Prioridade.Alta,
-        },
-    ],
-};
+import {criaTodoOperacoesConfigurado} from '../Config/Setup';
+
+const todoOperacoes = criaTodoOperacoesConfigurado();
 
 export const todoSlice = createSlice({
     name: 'todos',
-    initialState: {todos: todoSet},
+    initialState: {todos: <TodoSet | null>null},
     reducers: {
         setTodoSet: (state, action) => {
             state.todos = action.payload;
         },
+
+        loadTodoSet: state => {
+            state.todos = todoOperacoes.lista();
+        },
     },
 });
 
-export const {setTodoSet} = todoSlice.actions;
+export const {setTodoSet, loadTodoSet} = todoSlice.actions;
 
 export const selectTodos = (state: RootState) => state.todos.todos;
 
