@@ -18,11 +18,15 @@ export class TodoOperacoes {
     }
 
     adiciona(todos: TodoSet, todoNovo: Todo): TodoSet {
-        return {
-            [Prioridade.Alta]: []
-            ,[Prioridade.Media]: [todoNovo]
-            ,[Prioridade.Baixa]: []
+        let retorno = {
+            ...todos,
         };
+
+        this._repositorioTodo.salva(todoNovo);
+
+        retorno[todoNovo.prioridade].push(todoNovo);
+
+        return retorno;
     }
 
     remove(todos: TodoSet, todoRemover: Todo): TodoSet {
