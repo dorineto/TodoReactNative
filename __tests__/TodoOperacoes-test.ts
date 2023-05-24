@@ -22,23 +22,26 @@ beforeEach(() => {
 });
 
 describe('Adiciona todo', () => {
+    beforeEach(() => {
+        repositorioTodo.salva = jest.fn((todo: Todo) => {
+            todo.id = 1;
+            return true;
+        });
+    });
+
     test('novo todo no TodoSet', () => {
         // Dado - Given
-        const todoSetTest = TestTodoSetBuilder.buildVazio();
-
         const todoNovo: Todo = {
             id: 0,
             descricao: 'Teste Todo Novo',
             prioridade: Prioridade.Media,
         };
 
-        repositorioTodo.salva = jest.fn((todo: Todo) => {
-            todo.id = 1;
-            return true;
-        });
-
         // Quando - When
-        const resultado = todoOperacoesTest.adiciona(todoSetTest, todoNovo);
+        const resultado = todoOperacoesTest.adiciona(
+            TestTodoSetBuilder.buildVazio(),
+            todoNovo,
+        );
 
         // Entao - Then
         expect(resultado).not.toBeNull();
@@ -53,6 +56,27 @@ describe('Adiciona todo', () => {
 
         expect(repositorioTodo.salva).toBeCalled();
     });
+
+    test.each([
+        {id: -1, descricao: 'Teste', prioridade: Prioridade.Media},
+        {id: 1, descricao: 'Teste', prioridade: Prioridade.Media},
+        {id: 0, descricao: '', prioridade: Prioridade.Media},
+    ])(
+        'deve lançar excessão quando os valores do todo são invalidos. (id=$id, descricao="$descricao", prioridade=$prioridade)',
+        (todoTeste: Todo) => {
+            // Quando e Então - When and then
+            expect(() => {
+                todoOperacoesTest.adiciona(
+                    TestTodoSetBuilder.buildVazio(),
+                    todoTeste,
+                );
+            }).toThrowError();
+
+            expect(repositorioTodo.salva).not.toBeCalled();
+            expect(repositorioTodo.exclui).not.toBeCalled();
+            expect(repositorioTodo.selecionaTodos).not.toBeCalled();
+        },
+    );
 });
 
 class TestTodoSetBuilder {

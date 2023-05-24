@@ -18,6 +18,14 @@ export class TodoOperacoes {
     }
 
     adiciona(todos: TodoSet, todoNovo: Todo): TodoSet {
+        if (todoNovo.id !== 0) {
+            throw new Error('O id do novo todo tem que ser 0');
+        }
+
+        if (todoNovo.descricao.trim() === '') {
+            throw new Error('A descrição do novo todo não pode ser vazia');
+        }
+
         let retorno = {
             ...todos,
         };
