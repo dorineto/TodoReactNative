@@ -17,10 +17,14 @@ export const todoSlice = createSlice({
         loadTodoSet: state => {
             state.todos = todoOperacoes.lista();
         },
+
+        addTodo: (state, action) => {
+            state.todos = todoOperacoes.adiciona(state.todos, action.payload);
+        },
     },
 });
 
-export const {setTodoSet, loadTodoSet} = todoSlice.actions;
+export const {setTodoSet, loadTodoSet, addTodo} = todoSlice.actions;
 
 export const selectTodos = (state: RootState) => state.todos.todos;
 

@@ -29,7 +29,7 @@ describe('Adiciona todo', () => {
         });
     });
 
-    test('novo todo no TodoSet', () => {
+    test('Novo todo no TodoSet', () => {
         // Dado - Given
         const todoNovo: Todo = {
             id: 0,
@@ -61,9 +61,10 @@ describe('Adiciona todo', () => {
         {id: -1, descricao: 'Teste', prioridade: Prioridade.Media},
         {id: 1, descricao: 'Teste', prioridade: Prioridade.Media},
         {id: 0, descricao: '', prioridade: Prioridade.Media},
+        null,
     ])(
-        'deve lançar excessão quando os valores do todo são invalidos. (id=$id, descricao="$descricao", prioridade=$prioridade)',
-        (todoTeste: Todo) => {
+        'Deve lançar excessão quando os valores do todo são invalidos. %j',
+        (todoTeste: Todo | null) => {
             // Quando e Então - When and then
             expect(() => {
                 todoOperacoesTest.adiciona(
@@ -77,6 +78,25 @@ describe('Adiciona todo', () => {
             expect(repositorioTodo.selecionaTodos).not.toBeCalled();
         },
     );
+
+    test('O TodoSet sendo null', () => {
+        // Dado - Given
+        const todoNovo: Todo = {
+            id: 0,
+            descricao: 'Teste Todo Novo',
+            prioridade: Prioridade.Media,
+        };
+
+        // Quando - When
+        expect(() => {
+            todoOperacoesTest.adiciona(null, todoNovo);
+        }).toThrowError();
+
+        // Entao - Then
+        expect(repositorioTodo.salva).not.toBeCalled();
+        expect(repositorioTodo.exclui).not.toBeCalled();
+        expect(repositorioTodo.selecionaTodos).not.toBeCalled();
+    });
 });
 
 class TestTodoSetBuilder {

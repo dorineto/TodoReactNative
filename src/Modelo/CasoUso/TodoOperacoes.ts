@@ -1,4 +1,4 @@
-import {TodoSet, Todo, Prioridade} from '../Dominio/Todos';
+import {TodoSet, Todo} from '../Dominio/Todos';
 
 export interface TodoRepositorio {
     salva: (todo: Todo) => boolean;
@@ -17,7 +17,15 @@ export class TodoOperacoes {
         return this._repositorioTodo.selecionaTodos();
     }
 
-    adiciona(todos: TodoSet, todoNovo: Todo): TodoSet {
+    adiciona(todos: TodoSet | null, todoNovo: Todo | null): TodoSet {
+        if (todos == null) {
+            throw new Error('Os todos não pode ser nulo');
+        }
+
+        if (todoNovo == null) {
+            throw new Error('O todoNovo não pode ser nulo');
+        }
+
         if (todoNovo.id !== 0) {
             throw new Error('O id do novo todo tem que ser 0');
         }

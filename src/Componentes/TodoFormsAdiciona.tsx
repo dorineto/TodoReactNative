@@ -4,6 +4,8 @@ import {useState} from 'react';
 import {Button, TextInput, View, Text} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {Prioridade} from '../Modelo/Dominio/Todos';
+import {useDispatch} from 'react-redux';
+import {addTodo} from '../Slicers/todosSlice';
 
 type PrioridadeItem = {
     id: Prioridade;
@@ -11,7 +13,7 @@ type PrioridadeItem = {
 };
 
 type DropDownPrioridadesProps = {
-    onChange: (item: object) => void;
+    onChange: (item: PrioridadeItem) => void;
     value: PrioridadeItem;
 };
 
@@ -55,18 +57,65 @@ function DropDownPrioridades({
 }
 
 export function TodoFormsAdiciona(): JSX.Element {
-    const [prioridadeSelecionada, _] = useState(prioridades[1]);
+    const dispatch = useDispatch();
+    const defaultPrioridadeItem = prioridades[1];
+
+    const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(
+        defaultPrioridadeItem,
+    );
+    const [descricaoInserida, setDescricaoInserida] = useState('');
+
+    function adicionaNovoTodo(
+        descricao: string,
+        prioridadeItem: PrioridadeItem,
+    ) {
+        let prioridade: Prioridade;
+
+        switch (prioridadeItem.id) {
+            case Prioridade.Alta:
+                prioridade = Prioridade.Alta;
+                break;
+            case Prioridade.Baixa:
+                prioridade = Prioridade.Baixa;
+                break;
+            case Prioridade.Media:
+            default:
+                prioridade = Prioridade.Media;
+                break;
+        }
+
+        dispatch(
+            addTodo({
+                id: 0,
+                descricao: descricao,
+                prioridade: prioridade,
+            }),
+        );
+
+        setPrioridadeSelecionada(defaultPrioridadeItem);
+        setDescricaoInserida('');
+    }
 
     return (
         <View>
-            <TextInput id="todo-descricao" placeholder="Descricao" />
+            <TextInput
+                id="todo-descricao"
+                placeholder="Descricao"
+                value={descricaoInserida}
+                onChangeText={val => setDescricaoInserida(val)}
+            />
             <DropDownPrioridades
-                onChange={() => {
-                    return;
+                onChange={(item: PrioridadeItem) => {
+                    setPrioridadeSelecionada(item);
                 }}
                 value={prioridadeSelecionada}
             />
-            <Button title="Adiciona Todo" />
+            <Button
+                title="Adiciona Todo"
+                onPress={() =>
+                    adicionaNovoTodo(descricaoInserida, prioridadeSelecionada)
+                }
+            />
         </View>
     );
 }
