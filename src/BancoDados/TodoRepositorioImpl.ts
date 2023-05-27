@@ -25,23 +25,23 @@ const todoSetTestValues: TodoSet = {
         {
             id: 4,
             descricao: 'Tarefa com prioridade Baixa',
-            prioridade: Prioridade.Alta,
+            prioridade: Prioridade.Baixa,
         },
         {
             id: 5,
             descricao: 'O estilo desse projeto',
-            prioridade: Prioridade.Alta,
+            prioridade: Prioridade.Baixa,
         },
     ],
 };
 
 export class TodoRepositorioImpl implements TodoRepositorio {
     salva(todo: Todo): boolean {
-        return false;
+        return true;
     }
 
     exclui(todo: Todo): boolean {
-        return false;
+        return true;
     }
 
     selecionaTodos(): TodoSet {

@@ -38,18 +38,50 @@ export class TodoOperacoes {
             ...todos,
         };
 
-        this._repositorioTodo.salva(todoNovo);
+        if (!this._repositorioTodo.salva(todoNovo)) {
+            throw new Error('Houve um erro ao salvar o todo');
+        }
 
         retorno[todoNovo.prioridade].push(todoNovo);
 
         return retorno;
     }
 
-    remove(todos: TodoSet, todoRemover: Todo): TodoSet {
-        throw 'Não implementado';
+    remove(todos: TodoSet | null, todoRemover: Todo | null): TodoSet {
+        if (todos == null) {
+            throw new Error('Os todos não pode ser nulo');
+        }
+
+        if (todoRemover == null) {
+            throw new Error('O todo a remover não pode ser nulo');
+        }
+
+        if (todoRemover.id <= 0) {
+            throw new Error('O todo a remover tem que estar gravado');
+        }
+
+        const retorno = {
+            ...todos,
+        };
+
+        const indiceTodoRemover = retorno[todoRemover.prioridade].findIndex(
+            t => t.id === todoRemover.id,
+        );
+
+        if (indiceTodoRemover < 0) {
+            return retorno;
+        }
+
+        if (!this._repositorioTodo.exclui(todoRemover)) {
+            throw new Error('Houve um erro na exclusão do todo');
+        }
+
+        retorno[todoRemover.prioridade].splice(indiceTodoRemover, 1);
+
+        return retorno;
     }
 
-    atualiza(todos: TodoSet, todoAtualizar: Todo): TodoSet {
+    atualiza(todos: TodoSet | null, todoAtualizar: Todo | null): TodoSet {
         throw 'Não implementado';
     }
 }

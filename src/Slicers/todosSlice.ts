@@ -19,12 +19,27 @@ export const todoSlice = createSlice({
         },
 
         addTodo: (state, action) => {
-            state.todos = todoOperacoes.adiciona(state.todos, action.payload);
+            try {
+                state.todos = todoOperacoes.adiciona(
+                    state.todos,
+                    action.payload,
+                );
+            } catch (e) {
+                console.log(`[addTodo]: ${e}`);
+            }
+        },
+
+        deleteTodo: (state, action) => {
+            try {
+                state.todos = todoOperacoes.remove(state.todos, action.payload);
+            } catch (e) {
+                console.log(`[deleteTodo]: ${e}`);
+            }
         },
     },
 });
 
-export const {setTodoSet, loadTodoSet, addTodo} = todoSlice.actions;
+export const {setTodoSet, loadTodoSet, addTodo, deleteTodo} = todoSlice.actions;
 
 export const selectTodos = (state: RootState) => state.todos.todos;
 

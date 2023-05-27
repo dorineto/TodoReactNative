@@ -5,15 +5,20 @@ import {Text, View} from 'react-native';
 import {Todo, Prioridade} from '../Modelo/Dominio/Todos';
 
 import {TodoSet} from '../Modelo/Dominio/Todos';
+import {useDispatch} from 'react-redux';
+import {deleteTodo} from '../Slicers/todosSlice';
 
 type TodoItemProp = {
     todo: Todo;
 };
 
 function TodoItem({todo}: TodoItemProp): JSX.Element {
+    const dispatch = useDispatch();
+
     return (
         <View id={todo.id.toString()}>
             <Text>{todo.descricao}</Text>
+            <Text onPress={() => dispatch(deleteTodo(todo))}>(X)</Text>
         </View>
     );
 }
