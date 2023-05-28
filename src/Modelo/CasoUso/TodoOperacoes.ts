@@ -1,9 +1,10 @@
 import {TodoSet, Todo} from '../Dominio/Todos';
+import {cloneDeep} from 'lodash';
 
 export interface TodoRepositorio {
-    salva: (todo: Todo) => boolean;
-    exclui: (todo: Todo) => boolean;
-    selecionaTodos: () => TodoSet;
+    salva: (todo: Todo) => Promise<boolean>;
+    exclui: (todo: Todo) => Promise<boolean>;
+    selecionaTodos: () => Promise<TodoSet>;
 }
 
 export class TodoOperacoes {
@@ -13,11 +14,14 @@ export class TodoOperacoes {
         this._repositorioTodo = repositorioTodo;
     }
 
-    lista(): TodoSet {
-        return this._repositorioTodo.selecionaTodos();
+    async lista(): Promise<TodoSet> {
+        return await this._repositorioTodo.selecionaTodos();
     }
 
-    adiciona(todos: TodoSet | null, todoNovo: Todo | null): TodoSet {
+    async adiciona(
+        todos: TodoSet | null,
+        todoNovo: Todo | null,
+    ): Promise<TodoSet> {
         if (todos == null) {
             throw new Error('Os todos não pode ser nulo');
         }
@@ -34,11 +38,9 @@ export class TodoOperacoes {
             throw new Error('A descrição do novo todo não pode ser vazia');
         }
 
-        let retorno = {
-            ...todos,
-        };
+        let retorno = cloneDeep(todos);
 
-        if (!this._repositorioTodo.salva(todoNovo)) {
+        if (!(await this._repositorioTodo.salva(todoNovo))) {
             throw new Error('Houve um erro ao salvar o todo');
         }
 
@@ -47,7 +49,10 @@ export class TodoOperacoes {
         return retorno;
     }
 
-    remove(todos: TodoSet | null, todoRemover: Todo | null): TodoSet {
+    async remove(
+        todos: TodoSet | null,
+        todoRemover: Todo | null,
+    ): Promise<TodoSet> {
         if (todos == null) {
             throw new Error('Os todos não pode ser nulo');
         }
@@ -60,9 +65,7 @@ export class TodoOperacoes {
             throw new Error('O todo a remover tem que estar gravado');
         }
 
-        const retorno = {
-            ...todos,
-        };
+        const retorno = cloneDeep(todos);
 
         const indiceTodoRemover = retorno[todoRemover.prioridade].findIndex(
             t => t.id === todoRemover.id,
@@ -72,7 +75,7 @@ export class TodoOperacoes {
             return retorno;
         }
 
-        if (!this._repositorioTodo.exclui(todoRemover)) {
+        if (!(await this._repositorioTodo.exclui(todoRemover))) {
             throw new Error('Houve um erro na exclusão do todo');
         }
 
@@ -81,8 +84,43 @@ export class TodoOperacoes {
         return retorno;
     }
 
-    atualiza(todos: TodoSet | null, todoAtualizar: Todo | null): TodoSet {
-        throw 'Não implementado';
+    async atualiza(
+        todos: TodoSet | null,
+        todoValoresAtualizar: Todo | null,
+    ): Promise<TodoSet> {
+        if (todos == null) {
+            throw new Error('Os todos não pode ser nulo');
+        }
+
+        if (todoValoresAtualizar == null) {
+            throw new Error('O todo que será atualizado não pode ser nulo');
+        }
+
+        if (todoValoresAtualizar.id <= 0) {
+            throw new Error(
+                'O todo tem que estar salvo para poder ser atualizado',
+            );
+        }
+
+        const retorno = cloneDeep(todos);
+
+        const todoAtualizar = retorno[todoValoresAtualizar.prioridade].find(
+            val => val.id === todoValoresAtualizar.id,
+        );
+
+        if (todoAtualizar === undefined) {
+            return retorno;
+        }
+
+        if (!(await this._repositorioTodo.salva(todoValoresAtualizar))) {
+            throw new Error('Houve um erro a o atualizar o todo');
+        }
+
+        if (todoAtualizar.descricao !== todoValoresAtualizar.descricao) {
+            todoAtualizar.descricao = todoValoresAtualizar.descricao;
+        }
+
+        return retorno;
     }
 }
 

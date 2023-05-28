@@ -1,13 +1,15 @@
 import React from 'react';
 import {useCallback, useEffect} from 'react';
 import {View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {selectTodos, loadTodoSet} from '../Slicers/todosSlice';
 import TodoLista from './TodoLista';
 import {TodoFormsAdiciona} from './TodoFormsAdiciona';
+import {useAppDispatch} from '../Slicers/store';
 
 export default function TodoTela(): JSX.Element {
-    const dispatch = useDispatch();
+    //const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const todos = useSelector(selectTodos);
 
     const loadTodoSetCallback = useCallback(() => {

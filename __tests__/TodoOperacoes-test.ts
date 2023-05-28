@@ -13,9 +13,9 @@ let todoOperacoesTest: TodoOperacoes;
 
 beforeEach(() => {
     repositorioTodo = {
-        salva: jest.fn((_: Todo) => false),
-        exclui: jest.fn((_: Todo) => false),
-        selecionaTodos: jest.fn(() => TestTodoSetBuilder.buildVazio()),
+        salva: jest.fn(async (_: Todo) => false),
+        exclui: jest.fn(async (_: Todo) => false),
+        selecionaTodos: jest.fn(async () => TestTodoSetBuilder.buildVazio()),
     };
 
     todoOperacoesTest = new TodoOperacoes(repositorioTodo);
@@ -23,13 +23,13 @@ beforeEach(() => {
 
 describe('Adiciona todo', () => {
     beforeEach(() => {
-        repositorioTodo.salva = jest.fn((todo: Todo) => {
+        repositorioTodo.salva = jest.fn(async (todo: Todo) => {
             todo.id = 1;
             return true;
         });
     });
 
-    test('Novo todo no TodoSet', () => {
+    test('Novo todo no TodoSet', async () => {
         // Dado - Given
         const todoNovo: Todo = {
             id: 0,
@@ -38,7 +38,7 @@ describe('Adiciona todo', () => {
         };
 
         // Quando - When
-        const resultado = todoOperacoesTest.adiciona(
+        const resultado = await todoOperacoesTest.adiciona(
             TestTodoSetBuilder.buildVazio(),
             todoNovo,
         );
@@ -64,14 +64,14 @@ describe('Adiciona todo', () => {
         null,
     ])(
         'Deve lançar excessão quando os valores do todo são invalidos. %j',
-        (todoTeste: Todo | null) => {
+        async (todoTeste: Todo | null) => {
             // Quando e Então - When and then
-            expect(() => {
+            await expect(
                 todoOperacoesTest.adiciona(
                     TestTodoSetBuilder.buildVazio(),
                     todoTeste,
-                );
-            }).toThrowError();
+                ),
+            ).rejects.toThrowError();
 
             expect(repositorioTodo.salva).not.toBeCalled();
             expect(repositorioTodo.exclui).not.toBeCalled();
@@ -79,7 +79,7 @@ describe('Adiciona todo', () => {
         },
     );
 
-    test('O TodoSet sendo null', () => {
+    test('O TodoSet sendo null', async () => {
         // Dado - Given
         const todoNovo: Todo = {
             id: 0,
@@ -88,9 +88,9 @@ describe('Adiciona todo', () => {
         };
 
         // Quando - When
-        expect(() => {
-            todoOperacoesTest.adiciona(null, todoNovo);
-        }).toThrowError();
+        await expect(
+            todoOperacoesTest.adiciona(null, todoNovo),
+        ).rejects.toThrowError();
 
         // Entao - Then
         expect(repositorioTodo.salva).not.toBeCalled();
@@ -98,7 +98,7 @@ describe('Adiciona todo', () => {
         expect(repositorioTodo.selecionaTodos).not.toBeCalled();
     });
 
-    test('Quando o repositorio retornar false deve lançar um error', () => {
+    test('Quando o repositorio retornar false deve lançar um error', async () => {
         // Dado - Given
         const todoNovo: Todo = {
             id: 0,
@@ -108,14 +108,14 @@ describe('Adiciona todo', () => {
 
         const todoSetTest = TestTodoSetBuilder.buildVazio();
 
-        repositorioTodo.salva = jest.fn((_: Todo) => {
+        repositorioTodo.salva = jest.fn(async (_: Todo) => {
             return false;
         });
 
         // Quando - When
-        expect(() => {
-            todoOperacoesTest.adiciona(todoSetTest, todoNovo);
-        }).toThrowError();
+        await expect(
+            todoOperacoesTest.adiciona(todoSetTest, todoNovo),
+        ).rejects.toThrowError();
 
         // Entao - Then
         expect(repositorioTodo.salva).toBeCalled();
@@ -128,12 +128,12 @@ describe('Adiciona todo', () => {
 
 describe('Delete Todo', () => {
     beforeEach(() => {
-        repositorioTodo.exclui = jest.fn((_: Todo) => {
+        repositorioTodo.exclui = jest.fn(async (_: Todo) => {
             return true;
         });
     });
 
-    test('Deleta todo com sucesso', () => {
+    test('Deleta todo com sucesso', async () => {
         // Given
         const todoRemover: Todo = {
             id: 1,
@@ -146,7 +146,10 @@ describe('Delete Todo', () => {
             .build();
 
         // When
-        const resultado = todoOperacoesTest.remove(todosSetTest, todoRemover);
+        const resultado = await todoOperacoesTest.remove(
+            todosSetTest,
+            todoRemover,
+        );
 
         // Then
         expect(resultado).not.toBeNull();
@@ -158,7 +161,7 @@ describe('Delete Todo', () => {
         expect(repositorioTodo.exclui).toBeCalled();
     });
 
-    test('Quando não existe todo que está sendo removido deve retornar o todoset sem alterar', () => {
+    test('Quando não existe todo que está sendo removido deve retornar o todoset sem alterar', async () => {
         // Given
         const todoRemover: Todo = {
             id: 2,
@@ -175,7 +178,10 @@ describe('Delete Todo', () => {
             .build();
 
         // When
-        const resultado = todoOperacoesTest.remove(todosSetTest, todoRemover);
+        const resultado = await todoOperacoesTest.remove(
+            todosSetTest,
+            todoRemover,
+        );
 
         // Then
         expect(resultado).not.toBeNull();
@@ -187,7 +193,7 @@ describe('Delete Todo', () => {
         expect(repositorioTodo.exclui).not.toBeCalled();
     });
 
-    test('Quando o repositorio retorna false lançar um erro', () => {
+    test('Quando o repositorio retorna false lançar um erro', async () => {
         // Given
         const todoRemover: Todo = {
             id: 1,
@@ -199,14 +205,14 @@ describe('Delete Todo', () => {
             .comTodosMediaPrioridade(todoRemover)
             .build();
 
-        repositorioTodo.exclui = jest.fn((_: Todo) => {
+        repositorioTodo.exclui = jest.fn(async (_: Todo) => {
             return false;
         });
 
         // When
-        expect(() =>
+        await expect(
             todoOperacoesTest.remove(todosSetTest, todoRemover),
-        ).toThrowError();
+        ).rejects.toThrowError();
 
         // Then
         expect(repositorioTodo.exclui).toBeCalled();
@@ -221,14 +227,14 @@ describe('Delete Todo', () => {
         null,
     ])(
         'Deve lançar excessão quando os valores do todo são invalidos. %j',
-        (todoTeste: Todo | null) => {
+        async (todoTeste: Todo | null) => {
             // Quando e Então - When and then
-            expect(() => {
+            await expect(
                 todoOperacoesTest.remove(
                     TestTodoSetBuilder.buildVazio(),
                     todoTeste,
-                );
-            }).toThrowError();
+                ),
+            ).rejects.toThrowError();
 
             expect(repositorioTodo.salva).not.toBeCalled();
             expect(repositorioTodo.exclui).not.toBeCalled();
@@ -236,7 +242,7 @@ describe('Delete Todo', () => {
         },
     );
 
-    test('O TodoSet sendo null', () => {
+    test('O TodoSet sendo null', async () => {
         // Dado - Given
         const todoExcluir: Todo = {
             id: 1,
@@ -245,9 +251,155 @@ describe('Delete Todo', () => {
         };
 
         // Quando - When
-        expect(() => {
-            todoOperacoesTest.remove(null, todoExcluir);
-        }).toThrowError();
+        await expect(
+            todoOperacoesTest.remove(null, todoExcluir),
+        ).rejects.toThrowError();
+
+        // Entao - Then
+        expect(repositorioTodo.salva).not.toBeCalled();
+        expect(repositorioTodo.exclui).not.toBeCalled();
+        expect(repositorioTodo.selecionaTodos).not.toBeCalled();
+    });
+});
+
+describe('Atualiza todo', () => {
+    beforeEach(() => {
+        repositorioTodo.salva = jest.fn(async (_: Todo) => true);
+    });
+
+    test('Quando informações corretas deve atualiza com suceso', async () => {
+        // Given
+        const todoSetTest = new TestTodoSetBuilder()
+            .comTodosMediaPrioridade({
+                id: 1,
+                descricao: 'Teste Atualização',
+                prioridade: Prioridade.Media,
+            })
+            .build();
+
+        const todoTest: Todo = {
+            id: 1,
+            descricao: 'Teste Atualizado',
+            prioridade: Prioridade.Media,
+        };
+
+        // when
+        const retorno = await todoOperacoesTest.atualiza(todoSetTest, todoTest);
+
+        // then
+        expect(retorno[Prioridade.Alta]).toHaveLength(0);
+        expect(retorno[Prioridade.Baixa]).toHaveLength(0);
+
+        expect(retorno[Prioridade.Media]).toHaveLength(1);
+        expect(retorno[Prioridade.Media][0]).toEqual(todoTest);
+
+        expect(repositorioTodo.salva).toBeCalled();
+    });
+
+    test('Quando repositorio retorna false deve lançar error', async () => {
+        // Given
+        const todoSetTest = new TestTodoSetBuilder()
+            .comTodosMediaPrioridade({
+                id: 1,
+                descricao: 'Teste Atualização',
+                prioridade: Prioridade.Media,
+            })
+            .build();
+
+        const todoTest: Todo = {
+            id: 1,
+            descricao: 'Teste Atualizado',
+            prioridade: Prioridade.Media,
+        };
+
+        repositorioTodo.salva = jest.fn(async (_: Todo) => false);
+
+        // when and then
+        await expect(
+            todoOperacoesTest.atualiza(todoSetTest, todoTest),
+        ).rejects.toThrowError();
+
+        expect(repositorioTodo.salva).toBeCalled();
+
+        expect(todoSetTest[Prioridade.Alta]).toHaveLength(0);
+        expect(todoSetTest[Prioridade.Baixa]).toHaveLength(0);
+
+        expect(todoSetTest[Prioridade.Media]).toHaveLength(1);
+        expect(todoSetTest[Prioridade.Media][0]).not.toEqual(todoTest);
+    });
+
+    test('Quando não existe todo deve retornar sem atualizar nenhum todo', async () => {
+        // Given
+        const todoSalvo = {
+            id: 1,
+            descricao: 'Teste Atualização',
+            prioridade: Prioridade.Media,
+        };
+
+        const todoSetTest = new TestTodoSetBuilder()
+            .comTodosMediaPrioridade(Object.assign({}, todoSalvo))
+            .build();
+
+        const todoTest: Todo = {
+            id: 2,
+            descricao: 'Teste Atualizado',
+            prioridade: Prioridade.Media,
+        };
+
+        // when
+        const retorno = await todoOperacoesTest.atualiza(todoSetTest, todoTest);
+
+        // then
+        expect(repositorioTodo.salva).not.toBeCalled();
+
+        expect(retorno[Prioridade.Alta]).toHaveLength(0);
+        expect(retorno[Prioridade.Baixa]).toHaveLength(0);
+
+        expect(retorno[Prioridade.Media]).toHaveLength(1);
+        expect(retorno[Prioridade.Media][0]).toEqual(todoSalvo);
+    });
+
+    test.each([
+        {id: 0, descricao: 'Teste', prioridade: Prioridade.Media},
+        null,
+    ])(
+        'Deve lançar excessão quando os valores do todo são invalidos. %j',
+        async (todoTeste: Todo | null) => {
+            //Given
+            const todoSetTest = new TestTodoSetBuilder()
+                .comTodosMediaPrioridade({
+                    ...(todoTeste ?? {
+                        id: 1,
+                        descricao: 'Teste',
+                        prioridade: Prioridade.Media,
+                    }),
+                    descricao: 'Teste',
+                })
+                .build();
+
+            // Quando e Então - When and then
+            await expect(
+                todoOperacoesTest.atualiza(todoSetTest, todoTeste),
+            ).rejects.toThrowError();
+
+            expect(repositorioTodo.salva).not.toBeCalled();
+            expect(repositorioTodo.exclui).not.toBeCalled();
+            expect(repositorioTodo.selecionaTodos).not.toBeCalled();
+        },
+    );
+
+    test('O TodoSet sendo null', async () => {
+        // Dado - Given
+        const todoExcluir: Todo = {
+            id: 1,
+            descricao: 'Teste Todo Atualiza',
+            prioridade: Prioridade.Media,
+        };
+
+        // Quando - When
+        await expect(
+            todoOperacoesTest.atualiza(null, todoExcluir),
+        ).rejects.toThrowError();
 
         // Entao - Then
         expect(repositorioTodo.salva).not.toBeCalled();

@@ -4,8 +4,8 @@ import {useState} from 'react';
 import {Button, TextInput, View, Text} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {Prioridade} from '../Modelo/Dominio/Todos';
-import {useDispatch} from 'react-redux';
 import {addTodo} from '../Slicers/todosSlice';
+import {useAppDispatch} from '../Slicers/store';
 
 type PrioridadeItem = {
     id: Prioridade;
@@ -57,7 +57,8 @@ function DropDownPrioridades({
 }
 
 export function TodoFormsAdiciona(): JSX.Element {
-    const dispatch = useDispatch();
+    //const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const defaultPrioridadeItem = prioridades[1];
 
     const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(
